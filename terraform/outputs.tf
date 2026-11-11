@@ -27,3 +27,8 @@ output "turnstile_sitekey" {
   description = "Public Turnstile site key (null when Turnstile is not enabled)."
   value       = try(module.turnstile[0].sitekey, null)
 }
+
+output "security_headers" {
+  description = "Security headers added at the edge."
+  value       = module.cache_headers.security_headers
+}

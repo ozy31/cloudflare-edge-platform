@@ -43,3 +43,10 @@ module "turnstile" {
   name       = "${local.name}-login"
   domains    = var.turnstile_domains
 }
+
+module "cache_headers" {
+  source = "./modules/cache-headers"
+
+  zone_id = var.zone_id
+  name    = local.name
+}
