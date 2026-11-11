@@ -88,3 +88,14 @@ module "logpush" {
   r2_access_key_id     = var.r2_access_key_id
   r2_secret_access_key = var.r2_secret_access_key
 }
+
+module "notifications" {
+  source = "./modules/notifications"
+  count  = length(var.alert_emails) > 0 ? 1 : 0
+
+  account_id  = var.account_id
+  zone_id     = var.zone_id
+  name        = local.name
+  emails      = var.alert_emails
+  webhook_url = var.alert_webhook_url
+}

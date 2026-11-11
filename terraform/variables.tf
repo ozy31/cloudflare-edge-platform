@@ -102,3 +102,16 @@ variable "r2_secret_access_key" {
   default     = ""
   sensitive   = true
 }
+
+variable "alert_emails" {
+  description = "Team email list for Cloudflare notifications. Empty disables notifications."
+  type        = list(string)
+  default     = []
+}
+
+variable "alert_webhook_url" {
+  description = "Optional on-call webhook URL for notifications."
+  type        = string
+  default     = null
+  sensitive   = true
+}

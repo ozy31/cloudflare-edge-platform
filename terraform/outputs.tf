@@ -53,3 +53,8 @@ output "logpush_bucket" {
   description = "R2 bucket receiving HTTP request logs (null when Logpush is disabled)."
   value       = try(module.logpush[0].bucket, null)
 }
+
+output "alerts" {
+  description = "Enabled Cloudflare notifications."
+  value       = try(module.notifications[0].alert_types, {})
+}

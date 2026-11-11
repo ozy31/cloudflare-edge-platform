@@ -12,6 +12,8 @@ variables {
     { hostname = "argocd.example.com", service = "https://argocd-server.argocd.svc.cluster.local:443", http2_origin = true },
   ]
   logpush              = { enabled = true }
+  alert_emails         = ["platform-oncall@example.com"]
+  alert_webhook_url    = "https://hooks.example.com/oncall"
   r2_access_key_id     = "test-key-id"
   r2_secret_access_key = "test-secret"
   access = {
@@ -65,5 +67,18 @@ run "logpush_to_r2" {
   assert {
     condition     = output.logpush_bucket == "edge-http-logs"
     error_message = "Logs must go to the R2 bucket."
+  }
+}
+
+run "alerts_for_edge_incidents" {
+  command = apply
+
+  assert {
+    condition     = output.alerts["ddos_l7"] == "dos_attack_l7" && output.alerts["tunnel_health"] == "tunnel_health_event"
+    error_message = "DDoS and tunnel health alerts must be enabled."
+  }
+  assert {
+    condition     = length(output.alerts) == 6
+    error_message = "All six edge alerts expected by default."
   }
 }

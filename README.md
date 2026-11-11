@@ -71,6 +71,20 @@ clients, credential stuffing, WAF false positives, origin errors and cache
 efficiency. They are tested against synthetic logs with known incidents
 (`make analytics`).
 
+## Alerts and runbooks
+
+`terraform/modules/notifications` enables Cloudflare notifications for DDoS,
+tunnel health, origin reachability, failing Logpush jobs, expiring service
+tokens and certificate events. They go to a team email list and, optionally,
+an on-call webhook. Each alert points to a runbook:
+
+- [DDoS](docs/runbooks/ddos.md)
+- [Tunnel down](docs/runbooks/tunnel-down.md)
+- [Origin errors](docs/runbooks/origin-errors.md)
+- [WAF false positive](docs/runbooks/waf-false-positive.md)
+- [Credential stuffing](docs/runbooks/credential-stuffing.md)
+- [Access service token rotation](docs/runbooks/access-service-token.md)
+
 ## Secrets
 
 The API token is only read from the environment. R2 credentials for Logpush are
