@@ -27,12 +27,26 @@ versions.env          pinned tool versions (Makefile + CI)
 No Cloudflare account is needed for the checks:
 
 ```bash
-make check      # fmt, validate (real provider schema), tflint
+make check      # fmt, validate, tflint, terraform test
 ```
 
 To apply against a real zone, copy `terraform/terraform.tfvars.example` to
 `terraform/terraform.tfvars`, export `CLOUDFLARE_API_TOKEN`, then run
 `terraform -chdir=terraform plan`.
+
+## Tests
+
+`terraform test` runs against a mocked Cloudflare provider, so it checks the
+real provider schema and our own rules without an account:
+
+- **Root stack** (`terraform/tests/`): secure defaults, optional parts off by
+  default, WAF and rate-limit rules loaded from YAML, a full setup with Tunnel,
+  Access and Turnstile, and inputs that must be rejected.
+- **Modules** (`terraform/modules/*/tests/`):
+  - DNS: an unproxied origin needs a reason; anti-spoofing records.
+  - Tunnel: routes only to in-cluster services; catch-all 404; origin TLS
+    verified.
+  - WAF and rate limits: unknown actions, duplicate refs, plan limits.
 
 ## Secrets
 

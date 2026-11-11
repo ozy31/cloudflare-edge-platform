@@ -11,3 +11,4 @@ __pycache__/
 *.log
 analytics/data/*.parquet
 analytics/data/*.ndjson
+terraform/modules/**/.terraform.lock.hcl

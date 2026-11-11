@@ -29,3 +29,5 @@ jobs:
         run: make validate
       - name: tflint
         run: make lint
+      - name: terraform test (mocked provider)
+        run: make test

@@ -4,7 +4,7 @@ export
 
 TF_DIR := terraform
 
-.PHONY: fmt validate lint check
+.PHONY: fmt validate lint test check
 
 fmt: ## Format all Terraform code
 	terraform fmt -recursive $(TF_DIR)
@@ -17,6 +17,16 @@ lint: ## tflint across root and modules
 	tflint --chdir=$(TF_DIR) --init >/dev/null
 	tflint --chdir=$(TF_DIR) --recursive
 
+MODULE_TESTS := dns tunnel waf rate-limits
+
+test: ## terraform test (mocked provider) for the root stack and modules
+	terraform -chdir=$(TF_DIR) test
+	@for m in $(MODULE_TESTS); do \
+	  echo "== module $$m"; \
+	  terraform -chdir=$(TF_DIR)/modules/$$m init -backend=false -input=false >/dev/null && \
+	  terraform -chdir=$(TF_DIR)/modules/$$m test || exit 1; \
+	done
+
 check: ## Everything CI runs that needs no Cloudflare account
 	terraform fmt -check -recursive $(TF_DIR)
-	$(MAKE) validate lint
+	$(MAKE) validate lint test
