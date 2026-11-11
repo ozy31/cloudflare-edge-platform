@@ -32,3 +32,14 @@ output "security_headers" {
   description = "Security headers added at the edge."
   value       = module.cache_headers.security_headers
 }
+
+output "tunnel_id" {
+  description = "Cloudflare Tunnel ID (null when no routes are configured)."
+  value       = try(module.tunnel[0].tunnel_id, null)
+}
+
+output "tunnel_token" {
+  description = "cloudflared token. Use: terraform output -raw tunnel_token | hack/tunnel-secret.sh"
+  value       = try(module.tunnel[0].token, null)
+  sensitive   = true
+}

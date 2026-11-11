@@ -45,3 +45,13 @@ variable "turnstile_domains" {
   type        = list(string)
   default     = []
 }
+
+variable "tunnel_routes" {
+  description = "Hostnames served through Cloudflare Tunnel and their in-cluster services."
+  type = list(object({
+    hostname     = string
+    service      = string
+    http2_origin = optional(bool, false)
+  }))
+  default = []
+}

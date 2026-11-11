@@ -50,3 +50,13 @@ module "cache_headers" {
   zone_id = var.zone_id
   name    = local.name
 }
+
+module "tunnel" {
+  source = "./modules/tunnel"
+  count  = length(var.tunnel_routes) > 0 ? 1 : 0
+
+  account_id = var.account_id
+  zone_id    = var.zone_id
+  name       = local.name
+  routes     = var.tunnel_routes
+}
