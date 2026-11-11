@@ -7,3 +7,8 @@ output "zone_settings" {
   description = "Zone settings managed by this stack."
   value       = module.zone_baseline.settings
 }
+
+output "hostnames" {
+  description = "Application hostnames managed in DNS."
+  value       = module.dns.hostnames
+}
