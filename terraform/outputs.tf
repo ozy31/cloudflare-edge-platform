@@ -48,3 +48,8 @@ output "access_applications" {
   description = "Internal tools protected by Cloudflare Access."
   value       = try(module.access[0].applications, {})
 }
+
+output "logpush_bucket" {
+  description = "R2 bucket receiving HTTP request logs (null when Logpush is disabled)."
+  value       = try(module.logpush[0].bucket, null)
+}

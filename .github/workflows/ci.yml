@@ -32,6 +32,17 @@ jobs:
       - name: terraform test (mocked provider)
         run: make test
 
+  analytics:
+    name: Log analytics (DuckDB)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r analytics/requirements.txt
+      - run: python -m pytest -q analytics/tests
+
   e2e:
     name: Kubernetes e2e (kind, local only)
     runs-on: ubuntu-latest

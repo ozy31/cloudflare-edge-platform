@@ -73,3 +73,18 @@ module "access" {
   require_mfa           = var.access.require_mfa
   service_tokens        = var.access.service_tokens
 }
+
+module "logpush" {
+  source = "./modules/logpush"
+  count  = var.logpush.enabled ? 1 : 0
+
+  account_id           = var.account_id
+  zone_id              = var.zone_id
+  name                 = local.name
+  bucket_name          = var.logpush.bucket_name
+  retention_days       = var.logpush.retention_days
+  sample_rate          = var.logpush.sample_rate
+  only_security_events = var.logpush.only_security_events
+  r2_access_key_id     = var.r2_access_key_id
+  r2_secret_access_key = var.r2_secret_access_key
+}

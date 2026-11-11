@@ -76,3 +76,29 @@ variable "access" {
     error_message = "Access applications need at least one allowed email domain or email, otherwise nobody can get in."
   }
 }
+
+variable "logpush" {
+  description = "Push HTTP request logs to R2. Credentials come from TF_VAR_r2_access_key_id / TF_VAR_r2_secret_access_key."
+  type = object({
+    enabled              = optional(bool, false)
+    bucket_name          = optional(string, "edge-http-logs")
+    retention_days       = optional(number, 30)
+    sample_rate          = optional(number, 1)
+    only_security_events = optional(bool, false)
+  })
+  default = {}
+}
+
+variable "r2_access_key_id" {
+  description = "R2 access key ID for Logpush (only needed when logpush.enabled)."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "r2_secret_access_key" {
+  description = "R2 secret access key for Logpush (only needed when logpush.enabled)."
+  type        = string
+  default     = ""
+  sensitive   = true
+}

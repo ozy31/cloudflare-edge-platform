@@ -11,6 +11,9 @@ variables {
     { hostname = "app.example.com", service = "http://web.app.svc.cluster.local:80" },
     { hostname = "argocd.example.com", service = "https://argocd-server.argocd.svc.cluster.local:443", http2_origin = true },
   ]
+  logpush              = { enabled = true }
+  r2_access_key_id     = "test-key-id"
+  r2_secret_access_key = "test-secret"
   access = {
     applications = [
       { name = "argocd", hostname = "argocd.example.com", allow_machines = true },
@@ -53,5 +56,14 @@ run "turnstile_enabled" {
   assert {
     condition     = output.turnstile_sitekey != null
     error_message = "Turnstile site key must be output when Turnstile is enabled."
+  }
+}
+
+run "logpush_to_r2" {
+  command = apply
+
+  assert {
+    condition     = output.logpush_bucket == "edge-http-logs"
+    error_message = "Logs must go to the R2 bucket."
   }
 }

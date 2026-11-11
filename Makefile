@@ -4,7 +4,7 @@ export
 
 TF_DIR := terraform
 
-.PHONY: fmt validate lint test check e2e e2e-down
+.PHONY: fmt validate lint test check e2e e2e-down analytics
 
 fmt: ## Format all Terraform code
 	terraform fmt -recursive $(TF_DIR)
@@ -36,3 +36,7 @@ e2e: ## kind e2e: Pod Security admission, no exposed services, NetworkPolicy iso
 
 e2e-down: ## Delete the e2e kind cluster
 	kind delete cluster --name edge-e2e
+
+analytics: ## Generate synthetic Logpush data and test the DuckDB queries
+	python3 -m venv .venv && .venv/bin/pip install -q -r analytics/requirements.txt
+	.venv/bin/python -m pytest -q analytics/tests

@@ -63,7 +63,16 @@ adds a check through Cloudflare's real edge, using an account-less quick
 tunnel. **It makes the demo origin publicly reachable** at a random
 `trycloudflare.com` URL until the test finishes and removes the tunnel.
 
+## Edge log analytics
+
+`terraform/modules/logpush` pushes HTTP request logs to R2 with 30-day
+retention. [`analytics/`](analytics/README.md) has DuckDB queries for blocked
+clients, credential stuffing, WAF false positives, origin errors and cache
+efficiency. They are tested against synthetic logs with known incidents
+(`make analytics`).
+
 ## Secrets
 
-The API token is only read from the environment. Nothing in this repository
+The API token is only read from the environment. R2 credentials for Logpush are
+sensitive variables passed as `TF_VAR_r2_*`. Nothing in this repository
 contains account IDs, zone IDs or tokens, and `terraform.tfvars` is git-ignored.
