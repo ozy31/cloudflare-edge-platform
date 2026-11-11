@@ -1,0 +1,105 @@
+# Demo origin. The namespace label is what lets cloudflared reach it.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app
+  labels:
+    edge.cloudflare.com/exposed: "true"
+    pod-security.kubernetes.io/enforce: restricted
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web
+  namespace: app
+data:
+  index.html: |
+    <h1>cloudflare-edge-platform demo origin</h1>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: web
+          image: nginxinc/nginx-unprivileged:1.29-alpine
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: html
+          configMap:
+            name: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: app
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+# A namespace without the label: cloudflared must not be able to reach it.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: private
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: private
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: nginxinc/nginx-unprivileged:1.29-alpine
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: private
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 8080

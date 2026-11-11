@@ -48,6 +48,21 @@ real provider schema and our own rules without an account:
     verified.
   - WAF and rate limits: unknown actions, duplicate refs, plan limits.
 
+## Kubernetes e2e
+
+`make e2e` creates a kind cluster and checks the cloudflared deployment:
+
+- The manifests are admitted under the `restricted` Pod Security Standard.
+- The cluster exposes no LoadBalancer or NodePort services.
+- NetworkPolicy isolation, tested with a probe pod that carries cloudflared's
+  labels: it reaches namespaces labelled `edge.cloudflare.com/exposed=true`,
+  but not unlabelled namespaces or the Kubernetes API server.
+
+Nothing is exposed to the internet by default. `E2E_PUBLIC_TUNNEL=1 make e2e`
+adds a check through Cloudflare's real edge, using an account-less quick
+tunnel. **It makes the demo origin publicly reachable** at a random
+`trycloudflare.com` URL until the test finishes and removes the tunnel.
+
 ## Secrets
 
 The API token is only read from the environment. Nothing in this repository

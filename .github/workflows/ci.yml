@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Load versions
-        run: cat versions.env >> "$GITHUB_ENV"
+        run: grep -E "^[A-Z_]+=" versions.env >> "$GITHUB_ENV"
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
@@ -31,3 +31,20 @@ jobs:
         run: make lint
       - name: terraform test (mocked provider)
         run: make test
+
+  e2e:
+    name: Kubernetes e2e (kind, local only)
+    runs-on: ubuntu-latest
+    needs: terraform
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load versions
+        run: grep -E "^[A-Z_]+=" versions.env >> "$GITHUB_ENV"
+      - name: Install kind
+        run: |
+          curl -sSLo "$RUNNER_TEMP/kind" "https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64"
+          chmod +x "$RUNNER_TEMP/kind" && sudo mv "$RUNNER_TEMP/kind" /usr/local/bin/kind
+      - name: shellcheck
+        run: shellcheck tests/e2e/*.sh hack/*.sh
+      - name: e2e
+        run: make e2e

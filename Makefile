@@ -4,7 +4,7 @@ export
 
 TF_DIR := terraform
 
-.PHONY: fmt validate lint test check
+.PHONY: fmt validate lint test check e2e e2e-down
 
 fmt: ## Format all Terraform code
 	terraform fmt -recursive $(TF_DIR)
@@ -30,3 +30,9 @@ test: ## terraform test (mocked provider) for the root stack and modules
 check: ## Everything CI runs that needs no Cloudflare account
 	terraform fmt -check -recursive $(TF_DIR)
 	$(MAKE) validate lint test
+
+e2e: ## kind e2e: Pod Security admission, no exposed services, NetworkPolicy isolation
+	tests/e2e/run.sh
+
+e2e-down: ## Delete the e2e kind cluster
+	kind delete cluster --name edge-e2e
