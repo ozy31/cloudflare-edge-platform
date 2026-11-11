@@ -55,3 +55,24 @@ variable "tunnel_routes" {
   }))
   default = []
 }
+
+variable "access" {
+  description = "Cloudflare Access for internal tools. Leave applications empty to skip."
+  type = object({
+    applications = optional(list(object({
+      name           = string
+      hostname       = string
+      allow_machines = optional(bool, false)
+    })), [])
+    allowed_email_domains = optional(list(string), [])
+    allowed_emails        = optional(list(string), [])
+    require_mfa           = optional(bool, true)
+    service_tokens        = optional(list(string), [])
+  })
+  default = {}
+
+  validation {
+    condition     = length(var.access.applications) == 0 || length(var.access.allowed_email_domains) + length(var.access.allowed_emails) > 0
+    error_message = "Access applications need at least one allowed email domain or email, otherwise nobody can get in."
+  }
+}

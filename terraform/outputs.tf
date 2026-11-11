@@ -43,3 +43,8 @@ output "tunnel_token" {
   value       = try(module.tunnel[0].token, null)
   sensitive   = true
 }
+
+output "access_applications" {
+  description = "Internal tools protected by Cloudflare Access."
+  value       = try(module.access[0].applications, {})
+}

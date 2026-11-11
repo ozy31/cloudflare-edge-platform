@@ -60,3 +60,16 @@ module "tunnel" {
   name       = local.name
   routes     = var.tunnel_routes
 }
+
+module "access" {
+  source = "./modules/access"
+  count  = length(var.access.applications) > 0 ? 1 : 0
+
+  account_id            = var.account_id
+  name                  = local.name
+  applications          = var.access.applications
+  allowed_email_domains = var.access.allowed_email_domains
+  allowed_emails        = var.access.allowed_emails
+  require_mfa           = var.access.require_mfa
+  service_tokens        = var.access.service_tokens
+}
