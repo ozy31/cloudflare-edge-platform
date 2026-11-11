@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars (git-ignored) and fill in. IDs are not secrets,
+# but they are account-specific, so they stay out of the repository.
+# The API token goes in the CLOUDFLARE_API_TOKEN environment variable.
+
+zone_id     = "00000000000000000000000000000000"
+zone_name   = "example.com"
+environment = "prod"
