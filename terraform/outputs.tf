@@ -17,3 +17,13 @@ output "waf_custom_rules" {
   description = "Custom WAF rules in evaluation order."
   value       = module.waf.custom_rule_refs
 }
+
+output "rate_limit_rules" {
+  description = "Rate limiting rules in evaluation order."
+  value       = module.rate_limits.rule_refs
+}
+
+output "turnstile_sitekey" {
+  description = "Public Turnstile site key (null when Turnstile is not enabled)."
+  value       = try(module.turnstile[0].sitekey, null)
+}

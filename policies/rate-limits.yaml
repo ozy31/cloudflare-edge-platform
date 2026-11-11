@@ -1,0 +1,22 @@
+# Rate limiting rules. Counting is per client IP per Cloudflare data centre.
+# Sizing notes are in docs/adr/0003-rate-limit-sizing.md.
+#
+# period: seconds (10 on the free plan; 10/60/120/300/600/3600 on paid plans)
+# requests: requests allowed per period before the action applies
+# timeout: seconds the action stays in place once triggered
+
+- ref: login_bruteforce
+  description: Password guessing on the login endpoint
+  expression: http.request.uri.path eq "/api/auth/login" and http.request.method eq "POST"
+  period: 60
+  requests: 10
+  timeout: 600
+  action: block
+
+- ref: api_burst
+  description: Single client hammering the API
+  expression: starts_with(http.request.uri.path, "/api/")
+  period: 10
+  requests: 200
+  timeout: 60
+  action: managed_challenge
