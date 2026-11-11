@@ -1,0 +1,43 @@
+# Custom WAF rules, evaluated top to bottom. Kept in YAML so application
+# teams can propose a rule in a pull request without touching Terraform.
+#
+# Fields: ref (stable ID), description, action, expression, enabled.
+# Actions allowed here: block, managed_challenge, js_challenge, skip.
+
+- ref: allow_verified_bots
+  description: Let verified crawlers and monitoring through the remaining custom rules
+  action: skip
+  expression: cf.client.bot
+  enabled: true
+
+- ref: block_unusual_methods
+  description: Only methods the applications actually serve
+  action: block
+  expression: not http.request.method in {"GET" "HEAD" "POST" "PUT" "PATCH" "DELETE" "OPTIONS"}
+  enabled: true
+
+- ref: block_scanner_paths
+  description: Paths only scanners ask for (no PHP or WordPress behind this zone)
+  action: block
+  expression: >-
+    starts_with(http.request.uri.path, "/wp-")
+    or ends_with(http.request.uri.path, ".php")
+    or http.request.uri.path contains "/.env"
+    or http.request.uri.path contains "/.git/"
+    or http.request.uri.path contains "/.aws/"
+  enabled: true
+
+- ref: challenge_empty_user_agent
+  description: Real browsers always send a User-Agent
+  action: managed_challenge
+  expression: http.user_agent eq "" and not starts_with(http.request.uri.path, "/api/")
+  enabled: true
+
+- ref: block_internal_paths_publicly
+  description: Metrics and debug endpoints are never served through the edge
+  action: block
+  expression: >-
+    starts_with(http.request.uri.path, "/metrics")
+    or starts_with(http.request.uri.path, "/debug/")
+    or starts_with(http.request.uri.path, "/actuator")
+  enabled: true
