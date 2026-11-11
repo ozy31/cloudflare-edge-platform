@@ -52,7 +52,14 @@ kubectl -n cloudflared run np-probe --image=curlimages/curl:8.17.0 --labels=app=
 kubectl -n cloudflared wait --for=condition=Ready pod/np-probe --timeout=90s >/dev/null
 probe() { kubectl -n cloudflared exec np-probe -- curl -sk -o /dev/null -w '%{http_code}' --max-time 5 "$1" 2>/dev/null || true; }
 
-[[ "$(probe http://web.app.svc.cluster.local)" == "200" ]] || fail "cloudflared cannot reach the exposed namespace"
+# Retry the positive check briefly: right after a rollout the Service can
+# still point at a terminating pod.
+reached=""
+for _ in $(seq 1 10); do
+  [[ "$(probe http://web.app.svc.cluster.local)" == "200" ]] && { reached=1; break; }
+  sleep 2
+done
+[[ -n "$reached" ]] || fail "cloudflared cannot reach the exposed namespace"
 pass "cloudflared can reach namespaces labelled edge.cloudflare.com/exposed"
 
 code=$(probe http://web.private.svc.cluster.local)
